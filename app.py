@@ -153,5 +153,8 @@ def eda_analytics():
     }
     return render_template('eda.html', eda=eda_plots)
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+if __name__ == "__main__":
+    # Pull the port assigned by Render, defaulting to 5000 if running locally
+    port = int(os.environ.get("PORT", 5000))
+    # Bind to 0.0.0.0 so Render can expose it publicly
+    app.run(host="0.0.0.0", port=port, debug=False)
