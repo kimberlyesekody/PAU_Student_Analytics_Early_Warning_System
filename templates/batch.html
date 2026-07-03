@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dynamic Batch Processing Pipeline</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f6f9;
+            padding: 40px;
+            margin: 0;
+        }
+
+        .header {
+            background-color: #1D3557;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .upload-area {
+            background: white;
+            padding: 30px;
+            border-radius: 6px;
+            text-align: center;
+            border: 2px dashed #4A5568;
+            margin-bottom: 30px;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #E2E8F0;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: #1D3557;
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+
+        tr:hover {
+            background-color: #F7FAFC;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .badge-risk {
+            background-color: #FED7D7;
+            color: #9B2C2C;
+        }
+
+        .badge-safe {
+            background-color: #C6F6D5;
+            color: #22543D;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h2>Format-Agnostic Dynamic Batch Data Processing Logs</h2>
+        <p><a href="/" style="color:white; text-decoration:none; font-weight:bold;">← Back to Dashboard Overview</a></p>
+    </div>
+
+    <div class="upload-area">
+        <h3>Upload Any Standard Delimited File (.csv)</h3>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="batch_file" accept=".csv" required style="margin-bottom: 15px;"><br>
+            <button type="submit"
+                style="background:#1D3557; color:white; padding:10px 25px; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">Process
+                Upload Log</button>
+        </form>
+    </div>
+
+    {% if csv_data %}
+    <div style="margin-bottom: 20px; text-align: right;">
+        <form method="POST" action="/download-csv">
+            <input type="hidden" name="csv_content" value="{{ csv_data }}">
+            <button type="submit"
+                style="background:#2A9D8F; color:white; padding:12px 30px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.95rem;">
+                📥 Download Evaluated Predictions Report Sheet (.csv)
+            </button>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if headers %}
+    <h3>Rendered Document Structure Stream</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    {% for header in headers %}
+                    <th>{{ header }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr style="color: #2D3748; font-weight: 500;">
+                    {% for cell in row %}
+                    <td>
+                        <!-- Target ONLY the calculated prediction metric headers by position -->
+                        {% if ml_evaluated and (loop.index0 == row|length - 1) %}
+                        {% if cell == 'AT RISK' or cell == '1' or cell == 1 %}
+                        <span style="color: #E63946; font-weight: bold;">AT RISK</span>
+                        {% else %}
+                        <span style="color: #2A9D8F; font-weight: bold;">SAFE</span>
+                        {% endif %}
+                        {% else %}
+                        <!-- Render all regular original data cell indices completely raw -->
+                        {{ cell }}
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</body>
+
+</html>

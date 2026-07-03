@@ -1,0 +1,171 @@
+<!-- Replace your entire templates/model_perf.html with this comprehensive model engine dashboard -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Model Validation Framework Matrix</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f6f9;
+            padding: 40px;
+            margin: 0;
+        }
+
+        .header {
+            background-color: #1D3557;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .row-grid {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            flex: 1;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        th {
+            background-color: #4A5568;
+            color: white;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .cell {
+            padding: 15px;
+            text-align: center;
+            border-radius: 4px;
+            font-weight: bold;
+            background: #EDF2F7;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h2 style="margin:0;">Advanced Architectural Statistical Model Validation Metrics</h2>
+        <p><a href="/" style="color:white; text-decoration:none; font-weight:bold;">← Return to Main Dashboard
+                Workspace</a></p>
+    </div>
+
+    <div class="row-grid">
+        <div class="card" style="flex: 1.5;">
+            <h3 style="margin-top:0;">Full Classification Report Stream</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Target Academic Class Label</th>
+                        <th>Precision</th>
+                        <th>Recall (Sensitivity)</th>
+                        <th>F1-Score Benchmark</th>
+                        <th>Support Population</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>Class 0 (Stable / Safe Student Status)</b></td>
+                        <td>{{ report['0']['precision']|round(2) }}</td>
+                        <td>{{ report['0']['recall']|round(2) }}</td>
+                        <td>{{ report['0']['f1-score']|round(2) }}</td>
+                        <td>{{ report['0']['support'] }} records</td>
+                    </tr>
+                    <tr>
+                        <td><b style="color:#E63946;">Class 1 (Academic Risk Pipeline Flags)</b></td>
+                        <td>{{ report['1']['precision']|round(2) }}</td>
+                        <td>{{ report['1']['recall']|round(2) }}</td>
+                        <td>{{ report['1']['f1-score']|round(2) }}</td>
+                        <td>{{ report['1']['support'] }} records</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card" style="flex: 1;">
+            <h3 style="margin-top:0;">Confusion Matrix Verification</h3>
+            <div class="matrix-grid">
+                <div class="cell">True Negatives (TN)<br><span style="font-size:1.5rem; color:#2B4C7E;">{{ cm.tn
+                        }}</span></div>
+                <div class="cell" style="color:#C53030; background:#FFF5F5;">False Positives (FP)<br><span
+                        style="font-size:1.5rem;">{{ cm.fp }}</span></div>
+                <div class="cell" style="color:#C05621; background:#FFFAF0;">False Negatives (FN)<br><span
+                        style="font-size:1.5rem;">{{ cm.fn }}</span></div>
+                <div class="cell" style="color:#22543D; background:#F0FFF4;">True Positives (TP)<br><span
+                        style="font-size:1.5rem;">{{ cm.tp }}</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="max-width: 600px; margin: 0 auto;">
+        <h3 style="margin-top:0; text-align:center;">Receiver Operating Characteristic (ROC Curve)</h3>
+        <p style="text-align:center; font-weight:bold; color:#1D3557;">Calculated Area Under Curve (AUC Metric) = {{ auc
+            }}</p>
+        <canvas id="rocChart"></canvas>
+    </div>
+
+    <script>
+        const rocPoints = JSON.parse('{{ roc | tojson | safe }}');
+        new Chart(document.getElementById('rocChart'), {
+            type: 'line',
+            data: {
+                datasets: [
+                    {
+                        label: 'Random Forest Baseline (AUC = {{ auc }})',
+                        data: rocPoints,
+                        borderColor: '#E63946',
+                        backgroundColor: 'rgba(230, 57, 70, 0.1)',
+                        fill: true,
+                        showLine: true
+                    },
+                    {
+                        label: 'Random Classifier Threshold Line',
+                        data: [{ x: 0, y: 0 }, { x: 1, y: 1 }],
+                        borderColor: '#718096',
+                        borderDash: [5, 5],
+                        showLine: true,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    x: { type: 'linear', position: 'bottom', title: { display: true, text: 'False Positive Rate (1 - Specificity)' }, min: 0, max: 1 },
+                    y: { title: { display: true, text: 'True Positive Rate (Sensitivity Mapping)' }, min: 0, max: 1 }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
