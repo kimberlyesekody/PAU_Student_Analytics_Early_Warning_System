@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 large_student_dataset.csv
 .env
+venv/
